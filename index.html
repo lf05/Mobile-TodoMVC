@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<head>
+    <title>TodoMVC</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.0/css/fontawesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.0/css/brands.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.0/css/solid.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/noto-sans-sc@12.0.0/noto_sans_sc_regular/css.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<script type="module">
+    import { TodoItem, TodoItemList } from './todoitem.js';
+</script>
+
+<style>
+    html {
+        font-family: Noto Sans SC;
+    }
+
+    html,
+    body,
+    ol {
+        padding: 0;
+        margin: 0;
+    }
+
+</style>
+
+<body>
+    <!-- <check-box></check-box>
+    <div style="display: flex;justify-content: center;align-items: center;">
+        <div class="dot"></div>
+    </div> -->
+    <todo-item-list>
+        <todo-item></todo-item>
+        <todo-item></todo-item>
+        <todo-item></todo-item>
+    </todo-item-list>
+</body>
+<script>
+    // document.getElementsByClassName('prefix')[0].addEventListener('touchstart', function (e) {
+    //     const span = document.createElement('span');
+    //     span.classList.add('wave');
+    //     span.style.left = `${e.changedTouches[0].clientX}px`;
+    //     span.style.top = `${e.changedTouches[0].clientY}px`;
+    //     this.appendChild(span);
+
+    //     this.addEventListener('touchend', function remove() {
+    //         this.removeChild(span);
+    //         this.removeEventListener('touchend', remove);
+    //     })
+    // })
+
+    // this.addEventListener('touchstart', () => {
+    //     const timer = setTimeout(() => {
+    //     }, 600);
+
+    //     this.addEventListener('touchend', function touchend() {
+    //         clearTimeout(timer);
+    //         this.removeEventListener('touchend', touchend);
+    //     })
+    // })
+
+
+</script>
+
+</html>
