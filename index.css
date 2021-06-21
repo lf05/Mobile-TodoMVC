@@ -1,0 +1,15 @@
+.wave-enter {
+    width: 0;
+    height: 0;
+}
+
+.wave-enter-active {
+    display: block;
+    border-radius: 50%;
+    background: #ebebeb;
+    position: absolute;
+    z-index: -1;
+    transform: translate(-50%, -50%);
+    transition: 0.3s ease-in;
+    transition-property: width, height;
+}
