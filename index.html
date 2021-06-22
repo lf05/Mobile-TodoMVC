@@ -10,15 +10,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.0/css/solid.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/noto-sans-sc@12.0.0/noto_sans_sc_regular/css.css">
     <link rel="stylesheet" href="index.css">
+    <script src="common.js"></script>
 </head>
 
 <script type="module">
-    import { TodoItem, TodoItemList } from './todoitem.js';
+    import './components/todoitem.js';
+    import './components/floatingwindow.js';
 </script>
 
 <style>
     html {
         font-family: Noto Sans SC;
+        letter-spacing: 0.02em;
     }
 
     html,
@@ -28,44 +31,108 @@
         margin: 0;
     }
 
+    .icon-add {
+        width: 60px;
+        height: 60px;
+        display: inline-block;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .icon-add::before,
+    .icon-add::after {
+        content: "";
+        display: block;
+        border: 2px solid #bdbdbd;
+        top: 0;
+        position: absolute;
+    }
+
+    .icon-add::before {
+        height: 16px;
+        width: 0;
+        margin: 22px 30px;
+    }
+
+    .icon-add::after {
+        height: 0;
+        width: 16px;
+        margin: 30px 22px;
+    }
+
+    #add-todo {
+        display: flex;
+        background: #f8f8f8;
+        height: 60px;
+        border-bottom: 1px solid #d9d9d9;
+    }
+
+    #add-todo .main {
+        height: 100%;
+        width: 100%;
+        font-size: 18px;
+        color: #bdbdbd;
+        line-height: 60px;
+        padding: 0 22px;
+        margin: 0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 </style>
 
 <body>
-    <!-- <check-box></check-box>
-    <div style="display: flex;justify-content: center;align-items: center;">
-        <div class="dot"></div>
-    </div> -->
-    <todo-item-list>
+    <todo-item-list id="todo-item-list">
         <todo-item></todo-item>
         <todo-item></todo-item>
         <todo-item></todo-item>
     </todo-item-list>
+
+    <div id="add-todo">
+        <i class="icon-add"></i>
+        <p class="main">Add a ToDo</p>
+    </div>
+
+    <floating-window id="floating-window">
+        <todo-item-editor id="todo-item-editor"></todo-item-editor>
+    </floating-window>
+
 </body>
-<script>
-    // document.getElementsByClassName('prefix')[0].addEventListener('touchstart', function (e) {
-    //     const span = document.createElement('span');
-    //     span.classList.add('wave');
-    //     span.style.left = `${e.changedTouches[0].clientX}px`;
-    //     span.style.top = `${e.changedTouches[0].clientY}px`;
-    //     this.appendChild(span);
+<script type="module">
+    import { addWaveTouch, addCancellableTouch } from "./utils.js";
 
-    //     this.addEventListener('touchend', function remove() {
-    //         this.removeChild(span);
-    //         this.removeEventListener('touchend', remove);
-    //     })
-    // })
+    const floatingWindow = document.getElementById('floating-window');
+    const todoItemEditor = document.getElementById('todo-item-editor');
+    const todoItemList =document.getElementById('todo-item-list');
 
-    // this.addEventListener('touchstart', () => {
-    //     const timer = setTimeout(() => {
-    //     }, 600);
-
-    //     this.addEventListener('touchend', function touchend() {
-    //         clearTimeout(timer);
-    //         this.removeEventListener('touchend', touchend);
-    //     })
-    // })
+    const addItem = document.getElementById('add-todo');
+    addCancellableTouch.call(addItem, () => {
+        floatingWindow.visible = true;
+    })
+    addWaveTouch.call(addItem);
 
 
+    floatingWindow.addEventListener('confirm',function(){
+        const todoItem = document.createElement('todo-item');
+        todoItemList.appendChild(todoItem);
+        todoItem.value = todoItemEditor.value;
+        todoItem.color = todoItemEditor.color;
+
+        this.visible = false;
+    })
+
+    floatingWindow.addEventListener('cancel',function(){
+        this.visible = false;
+    })
+
+    window.onbeforeunload = ()=>{
+    }
+    window.onload = ()=>{
+    }
+
+    function addTodoItem(){
+        
+    }
 </script>
 
 </html>
