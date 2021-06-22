@@ -21,6 +21,7 @@ export default class CheckBox extends HTMLElement {
             :host([disabled]) .checkbox{
                 border-radius: 50%;
                 border: 8px solid;
+                border-color: inherit;
             }
         
             .checkbox::before {
@@ -81,23 +82,22 @@ export default class CheckBox extends HTMLElement {
     }
 
     set checked(value) {
-        this.event.initEvent("change", false, true);
+        const event = document.createEvent("HTMLEvents")
+        event.initEvent("change", false, true);
         if (value === null || value === false) {
             this.removeAttribute('checked');
-            this.event.data = { "checked": false }
+            event.data = { "checked": false }
         } else {
             this.setAttribute('checked', '');
-            this.event.data = { "checked": true }
+            event.data = { "checked": true }
         }
-        this.dispatchEvent(this.event);
+        this.dispatchEvent(event);
     }
 
     connectedCallback() {
         this.addEventListener('touchstart', () => {
             this.checked = !this.checked;
         })
-
-        this.event = document.createEvent("HTMLEvents");
     }
 }
 
