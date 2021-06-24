@@ -1,0 +1,211 @@
+html {
+    font-family: Noto Sans SC;
+    letter-spacing: 0.02em;
+    user-select: none;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+html,
+body,
+ol,
+button {
+    padding: 0;
+    margin: 0;
+}
+
+button {
+    border: none;
+    outline: none;
+    background: none;
+}
+
+todo-item-list,
+todo-item {
+    position: relative;
+    display: block;
+    box-sizing: border-box;
+}
+
+todo-item-list {
+    z-index: 2;
+}
+
+todo-item {
+    z-index: 1;
+}
+
+floating-window {
+    z-index: 99;
+    position: relative;
+}
+
+.move-active {
+    transition: all 0.3s ease-in-out;
+}
+
+.bar {
+    display: flex;
+    background: #f8f8f8;
+    height: 60px;
+    border-bottom: 1px solid #d9d9d9;
+}
+
+.bar .main {
+    height: 100%;
+    width: 100%;
+    font-size: 18px;
+    color: #bdbdbd;
+    line-height: 60px;
+    padding: 0 22px;
+    margin: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.info {
+    height: 60px;
+    width: 100%;
+    font-size: 18px;
+    color: #bdbdbd;
+    line-height: 60px;
+    padding: 0 22px;
+    margin: 0;
+}
+
+#footer {
+    height: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+#footer footer {
+    position: fixed;
+    bottom: 0;
+    z-index: 98;
+    width: 100%;
+    background: #f8f8f8;
+    box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: space-between;
+    height: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+#footer.show,
+#footer.show footer {
+    height: 60px;
+}
+
+footer check-box {
+    display: flex;
+    padding: 22px;
+    flex-shrink: 0;
+}
+
+#undofinish,
+.icon-remove,
+.icon-add {
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.icon-remove::after,
+#undofinish::before,
+#undofinish::after,
+.icon-add::before,
+.icon-add::after {
+    content: "";
+    display: block;
+    border: 2px solid #bdbdbd;
+    top: 0;
+    position: absolute;
+}
+
+#undofinish::before,
+.icon-add::before {
+    height: 16px;
+    width: 0;
+    margin: 22px 30px;
+}
+
+.icon-remove::after,
+#undofinish::after,
+.icon-add::after {
+    height: 0;
+    width: 16px;
+    margin: 30px 22px;
+}
+
+#undofinish::before,
+#undofinish::after {
+    transform: rotate(45deg);
+    border-color: red;
+}
+
+#delete,
+#undofinish,
+#dofinish {
+    height: 60px;
+    width: 60px;
+    position: relative;
+    display: inline-block;
+}
+
+#dofinish::before {
+    content: "";
+    width: 7.54px;
+    height: 15.08px;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    border: 3px solid lightgreen;
+    border-left: none;
+    border-top: none;
+}
+
+#delete i {
+    display: block;
+    width: 8px;
+    border-top: 12px solid #bdbdbd;
+    border-left: 2px solid transparent;
+    border-right: 2px solid transparent;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: 4px;
+}
+
+#delete i::before,
+#delete i::after {
+    content: "";
+    display: block;
+    position: absolute;
+    background: #bdbdbd;
+}
+
+#delete i::before {
+    height: 2px;
+    width: 4px;
+    top: -16px;
+    left: 2px;
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+}
+
+#delete i::after {
+    width: 15px;
+    height: 2px;
+    border-top-left-radius: 2.8px;
+    border-top-right-radius: 2.8px;
+    top: -14px;
+    left: -4px;
+}

@@ -12,9 +12,10 @@ export default class CheckBox extends HTMLElement {
                 border-radius: 2px;
                 position: relative;
                 z-index: 0;
-                background: white;
+                background: inherit;
                 box-sizing: border-box;
                 display: inline-block;
+                overflow: hidden;
                 transition: border-width 0.3s ease-out;
             }
 
@@ -47,7 +48,7 @@ export default class CheckBox extends HTMLElement {
                 content: "";
                 width: 100%;
                 height: 100%;
-                background: inherit;
+                background: #f8f8f8;
                 display: block;
                 float: right;
             }
@@ -82,22 +83,31 @@ export default class CheckBox extends HTMLElement {
     }
 
     set checked(value) {
-        const event = document.createEvent("HTMLEvents")
-        event.initEvent("change", false, true);
         if (value === null || value === false) {
             this.removeAttribute('checked');
-            event.data = { "checked": false }
         } else {
             this.setAttribute('checked', '');
-            event.data = { "checked": true }
         }
-        this.dispatchEvent(event);
     }
 
     connectedCallback() {
-        this.addEventListener('touchstart', () => {
-            this.checked = !this.checked;
-        })
+        this.touch = function (e) {
+            e.stopPropagation();
+            const event = new CustomEvent('select', {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    selected: !this.checked
+                }
+            });
+            this.dispatchEvent(event);
+
+        }
+        this.addEventListener('touch', this.touch);
+    }
+
+    disconnectedCallback() {
+        this.removeEventListener('touch', this.touch);
     }
 }
 

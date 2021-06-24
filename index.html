@@ -4,134 +4,579 @@
     <title>TodoMVC</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <link rel="stylesheet"
+    <!-- <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.0/css/fontawesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.0/css/brands.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.0/css/solid.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.0/css/solid.min.css"> -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/noto-sans-sc@12.0.0/noto_sans_sc_regular/css.css">
-    <link rel="stylesheet" href="index.css">
-    <script src="common.js"></script>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/index.css">
+
 </head>
 
 <script type="module">
-    import './components/todoitem.js';
+    import "./js/common.js";
+    import { TodoItem, TodoItemList } from './components/todoitem.js';
     import './components/floatingwindow.js';
+    import CheckBox from './components/checkbox.js';
+    window.TodoItem = TodoItem;
+    window.TodoItemList = TodoItemList;
+    window.CheckBox = CheckBox;
 </script>
 
-<style>
-    html {
-        font-family: Noto Sans SC;
-        letter-spacing: 0.02em;
-    }
-
-    html,
-    body,
-    ol {
-        padding: 0;
-        margin: 0;
-    }
-
-    .icon-add {
-        width: 60px;
-        height: 60px;
-        display: inline-block;
-        position: relative;
-        flex-shrink: 0;
-    }
-
-    .icon-add::before,
-    .icon-add::after {
-        content: "";
-        display: block;
-        border: 2px solid #bdbdbd;
-        top: 0;
-        position: absolute;
-    }
-
-    .icon-add::before {
-        height: 16px;
-        width: 0;
-        margin: 22px 30px;
-    }
-
-    .icon-add::after {
-        height: 0;
-        width: 16px;
-        margin: 30px 22px;
-    }
-
-    #add-todo {
-        display: flex;
-        background: #f8f8f8;
-        height: 60px;
-        border-bottom: 1px solid #d9d9d9;
-    }
-
-    #add-todo .main {
-        height: 100%;
-        width: 100%;
-        font-size: 18px;
-        color: #bdbdbd;
-        line-height: 60px;
-        padding: 0 22px;
-        margin: 0;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-</style>
-
 <body>
-    <todo-item-list id="todo-item-list">
-        <todo-item></todo-item>
-        <todo-item></todo-item>
-        <todo-item></todo-item>
-    </todo-item-list>
+    <div id="container"></div>
 
-    <div id="add-todo">
+    <div class="bar" id="add-item">
         <i class="icon-add"></i>
         <p class="main">Add a ToDo</p>
     </div>
 
-    <floating-window id="floating-window">
-        <todo-item-editor id="todo-item-editor"></todo-item-editor>
+    <div class="bar" id="add-list">
+        <i class="icon-add"></i>
+        <p class="main">Add a List</p>
+    </div>
+
+    <div class="bar" id="clear-finish">
+        <i class="icon-remove"></i>
+        <p class="main">Clear the Finished ToDo</p>
+    </div>
+
+
+
+    <floating-window id="item-editor-window">
+        <todo-item-editor id="item-editor"></todo-item-editor>
     </floating-window>
 
+    <floating-window id="list-editor-window">
+        <todo-list-editor id="list-editor"></todo-list-editor>
+    </floating-window>
+
+    <floating-window id="delete-window">
+        <p class="info">确认删除?</p>
+    </floating-window>
+
+    <div id="footer">
+        <footer>
+            <check-box id="check-all"></check-box>
+            <div>
+                <button id="dofinish"></button>
+                <button id="undofinish"></button>
+                <button id="delete"><i></i></button>
+            </div>
+        </footer>
+    </div>
 </body>
 <script type="module">
-    import { addWaveTouch, addCancellableTouch } from "./utils.js";
+    import { addWaveTouch, getOffset, transition, nextKFrame } from "./js/utils.js";
+    var container, checkAll, store;
+    var lltouchable = true, ltouchable = true, touchable = true;
+    function disableScroll(e) {
+        document.body.style.overflow = "hidden";
+        e.preventDefault();
+    }
 
-    const floatingWindow = document.getElementById('floating-window');
-    const todoItemEditor = document.getElementById('todo-item-editor');
-    const todoItemList =document.getElementById('todo-item-list');
+    function enableScroll() {
+        document.body.style.overflow = null;
+    }
 
-    const addItem = document.getElementById('add-todo');
-    addCancellableTouch.call(addItem, () => {
-        floatingWindow.visible = true;
-    })
-    addWaveTouch.call(addItem);
+    function isOnHeader(e, list) {
+        const { offsetTop } = getOffset(list);
+        const pageY = e.changedTouches[0].pageY;
+        if (pageY >= offsetTop && pageY <= offsetTop + 60) {
+            return true;
+        }
+    }
 
+    var selectedItemSet = new Set();
+    var selectedListSet = new Set();
+    function select(target, selected) {
+        const items = target.onSelect(selected);
+        items.forEach(item => {
+            if (selected) {
+                selectedItemSet.add(item);
+            } else {
+                selectedItemSet.delete(item);
+            }
+        })
+        if (target instanceof TodoItemList) {
+            if (selected) {
+                selectedListSet.add(target);
+            } else {
+                selectedListSet.delete(target);
+            }
+        }
+    }
 
-    floatingWindow.addEventListener('confirm',function(){
+    var finishedItemSet = new Set();
+    function finish(target, finished) {
+        target.finished = finished;
+        if (finished) {
+            finishedItemSet.add(target);
+        } else {
+            finishedItemSet.delete(target);
+        }
+    }
+
+    function setSelecting(selecting) {
+        if (selecting) {
+            footer.classList.add('show');
+        } else {
+            footer.classList.remove('show');
+            checkAll.checked = false;
+        }
+        Array.from(container.children).forEach((element) => {
+            element.selecting = selecting;
+        })
+    }
+
+    function deleteItem(item) {
+        const parent = item.parentElement;
+        item.onDelete();
+        if (parent instanceof TodoItemList) {
+            if (parent.children.length === 0) {
+                parent.onDelete();
+            }
+        }
+    }
+
+    function createItem(newValue, parent = container) {
         const todoItem = document.createElement('todo-item');
-        todoItemList.appendChild(todoItem);
-        todoItem.value = todoItemEditor.value;
-        todoItem.color = todoItemEditor.color;
-
-        this.visible = false;
-    })
-
-    floatingWindow.addEventListener('cancel',function(){
-        this.visible = false;
-    })
-
-    window.onbeforeunload = ()=>{
-    }
-    window.onload = ()=>{
+        parent.appendChild(todoItem);
+        todoItem.value = newValue.value;
+        todoItem.color = newValue.color;
+        if (newValue.finished) {
+            todoItem.finished = true;
+        }
+        return todoItem;
     }
 
-    function addTodoItem(){
-        
+    function createList(newValue) {
+        const todoList = document.createElement('todo-item-list');
+        container.appendChild(todoList);
+        todoList.value = newValue.value;
+        return todoList;
+    }
+
+    function modifyItem(existingItem, newValue) {
+        existingItem.value = newValue.value;
+        existingItem.color = newValue.color;
+    }
+
+    window.onbeforeunload = () => {
+        store = [];
+        Array.from(container.children).forEach((element) => {
+            if (element instanceof TodoItem) {
+                const { tagName, color, value, finished } = element;
+                store.push({ tagName, color, value, finished });
+            } else if (element instanceof TodoItemList) {
+                const { tagName, value } = element;
+                var children = [];
+                Array.from(element.children).forEach(item => {
+                    const { tagName, color, value, finished } = item;
+                    children.push({ tagName, color, value, finished });
+                })
+                store.push({ tagName, value, children });
+            }
+        })
+        store = JSON.stringify(store);
+        localStorage.setItem('todo-data', store);
+    }
+    window.onload = () => {
+        container = document.getElementById('container');
+
+        store = localStorage.getItem('todo-data');
+        if (store) {
+            store = JSON.parse(store);
+            store.forEach(element => {
+                if (element.tagName === "TODO-ITEM") {
+                    createItem(element);
+                } else if (element.tagName === "TODO-ITEM-LIST") {
+                    const todoList = createList(element);
+                    element.children.forEach((item) => {
+                        createItem(item, todoList);
+                    });
+                }
+            })
+        }
+
+        const footer = document.getElementById('footer');
+        container.addEventListener('select', function (e) {
+            const target = e.target;
+            const selected = e.detail.selected;
+            console.log(target);
+            if (target instanceof TodoItem || target instanceof TodoItemList) {
+                select(target, selected);
+            }
+        })
+
+        container.addEventListener('touch', (e) => {
+            if (!touchable) {
+                return;
+            }
+            const target = e.target;
+            if (target instanceof TodoItemList) {
+                const { offsetTop } = getOffset(e.target);
+                const pageY = e.changedTouches[0].pageY;
+                if (pageY >= offsetTop && pageY <= offsetTop + 60) {
+                    target.expanded = !target.expanded;
+                }
+            }
+        })
+
+        var itemEditorWindowCaller, listEditorWindowCaller;
+        container.addEventListener('dbltouch', (e) => {
+            const target = e.target;
+            if (target instanceof TodoItem) {
+                itemEditorWindowCaller = target;
+                itemEditor.color = target.color;
+                itemEditor.value = target.value;
+                itemEditorWindow.visible = true;
+            } else if (target instanceof TodoItemList) {
+                listEditorWindowCaller = target;
+                listEditor.value = target.value;
+                listEditorWindow.visible = true;
+            }
+        })
+
+        container.addEventListener('longtouch', function (e) {
+            if (!ltouchable) {
+                return;
+            }
+            const target = e.target;
+            var init = false, expanded = false;
+            var { offsetTop } = getOffset(target);
+            var startY = e.changedTouches[0].pageY;
+            var previousTodo = target.getPreviousTodo(),
+                nextTodo = target.getNextTodo();
+            var previousY = offsetTop - 60,
+                nextY = offsetTop + 60 * 2;
+            var lastOfListOut = false;  //若target是list的最后一个元素时，target是否移出list
+
+            this.addEventListener('touchmove', function touchmove(e) {
+                disableScroll(e);
+                if (expanded) {
+                    return;
+                }
+
+                if (!init) {
+
+                    lltouchable = false;
+                    ltouchable = false;
+                    touchable = false;
+                    init = true;
+
+                    if (target instanceof TodoItemList) {
+                        if (isOnHeader(e, target)) {
+                            expanded = target.expanded;
+                            target.expanded = false;
+                            setTimeout(() => { expanded = false }, 300);  //等待收起动画结束
+                        }
+                    }
+
+                    target.style.zIndex = 10;
+                    this.addEventListener('touchend', function (e) {
+                        this.removeEventListener('touchmove', touchmove);
+                        if (target instanceof TodoItem && previousTodo instanceof TodoItemList && isOnHeader(e, previousTodo)) {
+                            target.parentElement.removeChild(target);
+                            previousTodo.addItem(target);
+                            Array.from(container.children).forEach((element) => {
+                                element.reset();
+                            })
+                        } else if (target instanceof TodoItem && nextTodo instanceof TodoItemList && isOnHeader(e, nextTodo)) {
+                            target.parentElement.removeChild(target);
+                            nextTodo.addItem(target);
+                            Array.from(container.children).forEach((element) => {
+                                element.reset();
+                            })
+                        } else {
+                            var top = parseFloat(getComputedStyle(target).top),
+                                { offsetTop } = getOffset(target);
+                            transition.call(target, 'move', 300, {
+                                nextFrame: () => {
+                                    target.style.top = `${previousY + 60 - offsetTop + top}px`;
+                                },
+                                lastFrame: () => {
+                                    target.parentElement.removeChild(target);
+
+                                    if (nextTodo) {
+                                        nextTodo.parentElement.insertBefore(target, nextTodo);
+                                    } else if (previousTodo.parentElement instanceof TodoItemList) {
+                                        previousTodo.parentElement.parentElement.appendChild(target);
+                                    } else {
+                                        previousTodo.parentElement.appendChild(target);
+                                    }
+                                    Array.from(container.children).forEach((element) => {
+                                        element.reset();
+                                    })
+                                }
+                            })
+                        }
+
+                        lltouchable = true;
+                        ltouchable = true;
+                        touchable = true;
+                        target.style.zIndex = null;
+                        enableScroll();
+                    }, { once: true });
+                }
+
+                const curY = e.changedTouches[0].pageY;
+
+                var curTop = curY - startY;
+                target.style.top = `${curTop}px`;
+
+
+                function virtualMove(element, targetY) {
+                    var top = parseFloat(getComputedStyle(element).top),
+                        { offsetTop } = getOffset(element);
+                    transition.call(element, 'move', 300, {
+                        firstFrame: () => {
+                            element.style.top = `${top}px`;
+                        },
+                        nextFrame: () => {
+                            element.style.top = `${targetY - offsetTop + top}px`;
+                        }
+                    })
+                }
+
+                if (target.parentElement instanceof TodoItemList) {
+                    target.parentElement.enableContainerOverflow();
+                }
+
+
+                //向上滑动一行
+                if (previousTodo && curY <= previousY) {
+
+                    function previous() {
+                        previousY -= 60;
+                        previousTodo = previousTodo.getPreviousTodo();
+                        if (previousTodo === target) {
+                            previousTodo = previousTodo.getPreviousTodo();
+                        }
+                    }
+                    if (target instanceof TodoItem) {
+                        if (previousTodo instanceof TodoItemList) {
+                            if (previousTodo.expanded) {  //target将要移出list
+                                const list = previousTodo;
+                                previousTodo.virtualRemoveFrontItem().then(() => {
+                                    if (target.parentElement !== list) {
+                                        const top = parseFloat(getComputedStyle(list).top);
+                                        list.reset();
+                                        list.style.top = `${Math.clamp(top + 60, -60, 60)}px`;
+                                        //将位移整理至根节点
+                                    }
+                                })
+                            } else {
+                                virtualMove(previousTodo, previousY + 60);   //target与list交换
+                            }
+                        } else {
+                            if (previousTodo.parentElement instanceof TodoItemList) {
+                                const list = previousTodo.parentElement;
+                                if (previousTodo === list.lastElementChild ||
+                                    target === list.lastElementChild && previousTodo === target.previousElementSibling) {  //target将要进入回到list
+                                    previousTodo.parentElement.virtualAppendItem();
+                                }
+                            }
+                            virtualMove(previousTodo, previousY + 60);  //target与item交换
+                        }
+                    } else {
+                        if (previousTodo.parentElement instanceof TodoItemList) {  //将要跳过已展开的list
+                            previous();
+                            return;
+                        }
+                        virtualMove(previousTodo, previousY + 60);  //target与item交换
+                    }
+
+                    nextTodo = previousTodo;
+                    nextY -= 60;
+                    previous();
+
+                } else if (nextTodo && curY >= nextY) {   //向下滑动一行
+                    function next() {
+                        nextY += 60;
+                        nextTodo = nextTodo.getNextTodo();
+                        if (nextTodo === target) {
+                            nextTodo = nextTodo.getNextTodo();
+                        }
+                    }
+                    if (target instanceof TodoItem) {
+                        if (nextTodo instanceof TodoItemList) {
+                            if (nextTodo.expanded) {  //将要移入list
+                                nextTodo.virtualPrependItem();
+                            } else {
+                                virtualMove(nextTodo, nextY - 120);  //target与list交换
+                            }
+                        } else {
+                            if (nextTodo.parentElement instanceof TodoItemList) {
+                                const list = nextTodo.parentElement;
+                                if (nextTodo === list.lastElementChild ||
+                                    target === list.lastElementChild && nextTodo === list.nextElementSibling) {  //将要移出list
+                                    list.virtualRemoveBackItem().then(() => {
+                                        if (target.parentElement !== list) {
+                                            const top = parseFloat(getComputedStyle(list).top);
+                                            list.reset();
+                                            list.style.top = `${Math.clamp(top - 60, -60, 60)}px`;
+                                            //将位移整理至根节点
+                                        }
+                                    })
+                                }
+                            }
+                            virtualMove(nextTodo, nextY - 120);  //target与list交换
+                        }
+                    } else {
+                        function jump(list) {
+                            next();
+                            if (nextTodo instanceof TodoItemList || !(nextTodo.parentElement instanceof TodoItemList)) {  //已跳过list
+                                virtualMove(list, nextY - (list.children.length + 1) * 60 - 120);  //target与list交换
+                                previousTodo = list;
+                            }
+                        }
+                        if (nextTodo instanceof TodoItemList) {
+                            if (nextTodo.expanded) {  //将要跳过已展开的list
+                                const list = nextTodo;
+                                jump(list);
+                                return;
+                            } else {
+                                virtualMove(nextTodo, nextY - 120);  //target与list交换
+                            }
+                        } else {
+                            if (nextTodo.parentElement instanceof TodoItemList) {  //将要跳过已展开的list
+                                const list = nextTodo.parentElement;
+                                jump(list);
+                                return;
+                            } else {
+                                virtualMove(nextTodo, nextY - 120);  //target与list交换
+                            }
+                        }
+                    }
+
+                    previousTodo = nextTodo;
+                    previousY += 60;
+                    next();
+
+                } else if (!lastOfListOut && curY >= offsetTop + 60) {
+                    if (target instanceof TodoItem && target.parentElement instanceof TodoItemList && target === target.parentElement.lastElementChild) {
+                        target.parentElement.virtualRemoveBackItem();
+                        targetOut = true;
+                    }
+                }
+
+            }, { passive: false })
+        })
+
+        var selecting = false;
+        container.addEventListener('longlongtouch', function (e) {
+            if (!lltouchable) {
+                return;
+            }
+            selecting = !selecting;
+            setSelecting(selecting);
+        })
+
+        const itemEditorWindow = document.getElementById('item-editor-window');
+        const itemEditor = document.getElementById('item-editor');
+        itemEditorWindow.addEventListener('confirm', function () {
+            const newValue = { value: itemEditor.value, color: itemEditor.color };
+            if (itemEditorWindowCaller) {
+                modifyItem(itemEditorWindowCaller, newValue);
+            } else {
+                createItem(newValue);
+            }
+            this.visible = false;
+        })
+        itemEditorWindow.addEventListener('cancel', function () {
+            this.visible = false;
+        })
+
+        const listEditorWindow = document.getElementById('list-editor-window');
+        const listEditor = document.getElementById('list-editor');
+        listEditorWindow.addEventListener('confirm', function () {
+            var todoList;
+            if (listEditorWindowCaller) {
+                todoList = listEditorWindowCaller;
+            } else {
+                todoList = document.createElement('todo-item-list');
+                container.appendChild(todoList);
+            }
+            todoList.value = listEditor.value;
+            this.visible = false;
+        })
+        listEditorWindow.addEventListener('cancel', function () {
+            this.visible = false;
+        })
+
+        const deleteWindow = document.getElementById('delete-window');
+        deleteWindow.addEventListener('confirm', function () {
+            selectedItemSet.forEach(deleteItem);
+            selectedListSet.forEach(deleteItem);
+            selectedItemSet.clear();
+            selectedListSet.clear();
+            this.visible = false;
+            setSelecting(false);
+        })
+        deleteWindow.addEventListener('cancel', function () {
+            this.visible = false;
+        })
+
+        const addItemBar = document.getElementById('add-item');
+        addItemBar.addEventListener('touch', () => {
+            itemEditorWindow.value = "";
+            itemEditorWindow.color = "lightgreen"
+            itemEditorWindow.visible = true;
+        })
+        addWaveTouch.call(addItemBar);
+
+        const addListBar = document.getElementById('add-list');
+        addListBar.addEventListener('touch', () => {
+            listEditorWindow.visible = true;
+        })
+        addWaveTouch.call(addListBar);
+
+        checkAll = document.getElementById('check-all');
+        checkAll.addEventListener('select', function (e) {
+            const selected = e.detail.selected;
+            this.checked = selected;
+            Array.from(container.children).forEach(element => {
+                select(element, selected);
+            })
+        })
+
+        const clearFinishedBar = document.getElementById('clear-finish');
+        clearFinishedBar.addEventListener('touch', () => {
+            finishedItemSet.forEach(deleteItem);
+            finishedItemSet.clear();
+            setSelecting(false);
+        })
+        addWaveTouch.call(clearFinishedBar);
+
+        const dofinish = document.getElementById('dofinish');
+        dofinish.addEventListener('touch', () => {
+            selectedItemSet.forEach(item => {
+                item.finished = true;
+                finish(item, true);
+            })
+            selectedItemSet.clear();
+            setSelecting(false);
+        })
+        addWaveTouch.call(dofinish);
+
+        const undofinish = document.getElementById('undofinish');
+        undofinish.addEventListener('touch', () => {
+            selectedItemSet.forEach(item => {
+                item.finished = false;
+                finish(item, false);
+            })
+            selectedItemSet.clear();
+            setSelecting(false);
+        })
+        addWaveTouch.call(undofinish);
+
+        const _delete = document.getElementById('delete');
+        _delete.addEventListener('touch', () => {
+            deleteWindow.visible = true;
+        })
+        addWaveTouch.call(_delete);
     }
 </script>
 

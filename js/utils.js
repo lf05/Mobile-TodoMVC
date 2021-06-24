@@ -17,71 +17,86 @@ export function addWaveTouch() {
 
         const span = document.createElement('span');
         span.classList.add('wave');
+        span.style.left = `${e.changedTouches[0].pageX - offsetLeft}px`;
+        span.style.top = `${e.changedTouches[0].pageY - offsetTop}px`;
         this.appendChild(span);
+
+        init();
+        const diameter = `${Math.sqrt(offsetWidth * offsetWidth + offsetHeight * offsetHeight) * 2}px`;
         transition.call(span, 'wave-enter', 300, {
             nextFrame: () => {
-                span.style.left = `${e.changedTouches[0].clientX - offsetLeft}px`;
-                span.style.top = `${e.changedTouches[0].clientY - offsetTop}px`;
+                span.style.width = diameter;
+                span.style.height = diameter;
             }
         })
 
-        setTimeout(() => {
-            init();
-            const diameter = `${Math.max(offsetWidth, offsetHeight) * Math.sqrt(2) * 2}px`;
-            span.style.width = diameter;
-            span.style.height = diameter;
-            span.classList.remove('wave-enter');
-        }, 16)
-
-        this.addEventListener('touchend', function remove(e) {
+        this.addEventListener('touchend', (e) => {
             this.removeChild(span);
-            this.removeEventListener('touchend', remove);
             reset();
-        })
-    })
-}
-
-export function addCancellableTouch(notCancelledCallback, cancelledCallback) {
-    this.addEventListener('touchend', function (e) {
-        const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = getOffset(this);
-        const relativeX = e.changedTouches[0].clientX - offsetLeft;
-        const relativeY = e.changedTouches[0].clientY - offsetTop;
-
-        if (0 <= relativeX && relativeX <= offsetWidth && 0 <= relativeY && relativeY <= offsetHeight) {
-            toFunction(notCancelledCallback)();
-        } else {
-            toFunction(cancelledCallback)();
-        }
+        }, { once: true })
     })
 }
 
 export function getOffset(element) {
     var { offsetTop, offsetLeft, offsetWidth, offsetHeight } = element;
+    var fixed = false;
     while (element.offsetParent != null) {
+        if (getComputedStyle(element).position === 'fixed') {
+            fixed = true;
+        }
         element = element.offsetParent;
         offsetLeft += element.offsetLeft;
         offsetTop += element.offsetTop;
     }
-    return { offsetTop, offsetLeft, offsetWidth, offsetHeight };
+    if (fixed) {
+        offsetTop += window.scrollY;
+    }
+    return {
+        offsetTop, offsetLeft, offsetWidth, offsetHeight
+    };
 }
 
 export function transition(name, duration = 0, callback = {}) {
+
+    toFunction(callback.firstFrame)();
     this.classList.add(`${name}`);
     this.classList.add(`${name}-active`);
-    toFunction(callback.firstFrame)();
-    setTimeout(() => {
+
+    nextKFrame(() => {
+        toFunction(callback.nextFrame)();
         this.classList.add(`${name}-to`);
         this.classList.remove(`${name}`);
-        toFunction(callback.nextFrame)();
+
         setTimeout(() => {
+            toFunction(callback.lastFrame)();
             this.classList.remove(`${name}-to`);
             this.classList.remove(`${name}-active`);
-            toFunction(callback.lastFrame)();
+            if (this.classList.length === 0) {
+                this.removeAttribute('class');
+            }
         }, duration);
-    }, 16);
+    })
 }
 
 const empty = () => { }
 function toFunction(func) {
     return func && typeof func === 'function' ? func : empty;
+}
+
+export function nextKFrame(callback, k = 2) {
+    callback = toFunction(callback);
+    //setTimeout(callback, 1000);
+    if (window.requestAnimationFrame) {
+        const frame = () => {
+            k--;
+            if (k == 0) {
+                callback();
+            } else {
+                window.requestAnimationFrame(frame);
+            }
+        }
+        window.requestAnimationFrame(frame);
+    } else {
+        setTimeout(callback, 16);
+    }
 }

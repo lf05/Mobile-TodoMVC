@@ -1,11 +1,11 @@
-import { addWaveTouch, addCancellableTouch, transition } from "../utils.js";
+import { addWaveTouch, transition } from "../js/utils.js";
 export class FloatingWindow extends HTMLElement {
     constructor() {
         super();
         const shadowRoot = this.attachShadow({ mode: 'open' });
         shadowRoot.innerHTML = `
         <style>
-            @import url("index.css");
+            @import url("css/index.css");
             :host(:not([visible])){
                 display: none;
             }
@@ -13,7 +13,7 @@ export class FloatingWindow extends HTMLElement {
             #mask {
                 width: 100%;
                 height: 100%;
-                position: absolute;
+                position: fixed;
                 top: 0;
                 left: 0;
                 display: flex;
@@ -44,13 +44,13 @@ export class FloatingWindow extends HTMLElement {
 
             .floating-window,
             #mask.leave .floating-window,
-            #mask.enter-to .floating-window{
+            #mask.enter-to .floating-window {
                 transform: translate3d(0, 0, 0);
                 opacity: 1;
             }
 
             #mask.leave-to,
-            #mask.enter{
+            #mask.enter {
                 background: rgba(0, 0, 0, 0);
             }
 
@@ -117,22 +117,27 @@ export class FloatingWindow extends HTMLElement {
     }
 
     connectedCallback() {
-        const event = document.createEvent("HTMLEvents");
         const confirm = this.shadowRoot.getElementById('confirm');
-        addCancellableTouch.call(confirm, () => {
-            event.initEvent('confirm', false, true);
-            this.dispatchEvent(event);
-        });
+        confirm.addEventListener('touch', () => {
+            const child = this.children[0];
+            if (!child.confirm || child.confirm && child.confirm()) {
+                const event = new CustomEvent('confirm')
+                this.dispatchEvent(event);
+            }
+        })
         addWaveTouch.call(confirm);
 
         const cancel = this.shadowRoot.getElementById('cancel');
-        addCancellableTouch.call(cancel, () => {
-            event.initEvent('cancel', false, true);
+        cancel.addEventListener('touch', () => {
+            const event = new CustomEvent('cancel')
             this.dispatchEvent(event);
         });
         addWaveTouch.call(cancel);
 
         this.mask = this.shadowRoot.getElementById('mask');
+        this.mask.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        })
     }
 }
 
