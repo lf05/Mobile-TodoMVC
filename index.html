@@ -22,14 +22,14 @@
 
 <body>
     <div id="container">
-        <todo-item>1</todo-item>
+        <!-- <todo-item>1</todo-item>
         <todo-item>2</todo-item>
         <todo-item>3</todo-item>
         <todo-item-list>
             <todo-item>1</todo-item>
             <todo-item>2</todo-item>
             <todo-item>3</todo-item>
-        </todo-item-list>
+        </todo-item-list> -->
     </div>
 
     <div class="bar" id="add-item">
@@ -73,20 +73,15 @@
     </div>
 </body>
 <script>
-    if (document.head.createShadowRoot || document.head.attachShadow) {
-        if(document.head.createShadowRoot){
-            alert('支持createShadowRoot')
-        }
-
-        if(document.head.attachShadow){
-            alert('支持attachShadow')
-        }
-    } else {
-        alert('不支持')
+    if(customElements){
+        alert('支持customElements');
     }
 </script>
 <script type="module">
     import { addWaveTouch, getOffset, transition, nextKFrame } from "./js/utils.js";
+    var test = new TodoItem();
+    document.getElementById('container').appendChild(test);
+
     var container, checkAll, store;
     var lltouchable = true, ltouchable = true, touchable = true;
     function disableScroll(e) {
@@ -181,42 +176,42 @@
         existingItem.color = newValue.color;
     }
 
-    window.onbeforeunload = () => {
-        store = [];
-        Array.from(container.children).forEach((element) => {
-            if (element instanceof TodoItem) {
-                const { tagName, color, value, finished } = element;
-                store.push({ tagName, color, value, finished });
-            } else if (element instanceof TodoItemList) {
-                const { tagName, value } = element;
-                var children = [];
-                Array.from(element.children).forEach(item => {
-                    const { tagName, color, value, finished } = item;
-                    children.push({ tagName, color, value, finished });
-                })
-                store.push({ tagName, value, children });
-            }
-        })
-        store = JSON.stringify(store);
-        localStorage.setItem('todo-data', store);
-    }
+    // window.onbeforeunload = () => {
+    //     store = [];
+    //     Array.from(container.children).forEach((element) => {
+    //         if (element instanceof TodoItem) {
+    //             const { tagName, color, value, finished } = element;
+    //             store.push({ tagName, color, value, finished });
+    //         } else if (element instanceof TodoItemList) {
+    //             const { tagName, value } = element;
+    //             var children = [];
+    //             Array.from(element.children).forEach(item => {
+    //                 const { tagName, color, value, finished } = item;
+    //                 children.push({ tagName, color, value, finished });
+    //             })
+    //             store.push({ tagName, value, children });
+    //         }
+    //     })
+    //     store = JSON.stringify(store);
+    //     localStorage.setItem('todo-data', store);
+    // }
     window.onload = () => {
         container = document.getElementById('container');
 
-        store = localStorage.getItem('todo-data');
-        if (store) {
-            store = JSON.parse(store);
-            store.forEach(element => {
-                if (element.tagName === "TODO-ITEM") {
-                    createItem(element);
-                } else if (element.tagName === "TODO-ITEM-LIST") {
-                    const todoList = createList(element);
-                    element.children.forEach((item) => {
-                        createItem(item, todoList);
-                    });
-                }
-            })
-        }
+        // store = localStorage.getItem('todo-data');
+        // if (store) {
+        //     store = JSON.parse(store);
+        //     store.forEach(element => {
+        //         if (element.tagName === "TODO-ITEM") {
+        //             createItem(element);
+        //         } else if (element.tagName === "TODO-ITEM-LIST") {
+        //             const todoList = createList(element);
+        //             element.children.forEach((item) => {
+        //                 createItem(item, todoList);
+        //             });
+        //         }
+        //     })
+        // }
 
         const footer = document.getElementById('footer');
         container.addEventListener('select', function (e) {
