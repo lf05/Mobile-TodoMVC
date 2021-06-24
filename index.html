@@ -494,35 +494,35 @@
             this.visible = false;
         })
 
-        const listEditorWindow = document.getElementById('list-editor-window');
-        const listEditor = document.getElementById('list-editor');
-        listEditorWindow.addEventListener('confirm', function () {
-            var todoList;
-            if (listEditorWindowCaller) {
-                todoList = listEditorWindowCaller;
-            } else {
-                todoList = document.createElement('todo-item-list');
-                container.appendChild(todoList);
-            }
-            todoList.value = listEditor.value;
-            this.visible = false;
-        })
-        listEditorWindow.addEventListener('cancel', function () {
-            this.visible = false;
-        })
+        // const listEditorWindow = document.getElementById('list-editor-window');
+        // const listEditor = document.getElementById('list-editor');
+        // listEditorWindow.addEventListener('confirm', function () {
+        //     var todoList;
+        //     if (listEditorWindowCaller) {
+        //         todoList = listEditorWindowCaller;
+        //     } else {
+        //         todoList = document.createElement('todo-item-list');
+        //         container.appendChild(todoList);
+        //     }
+        //     todoList.value = listEditor.value;
+        //     this.visible = false;
+        // })
+        // listEditorWindow.addEventListener('cancel', function () {
+        //     this.visible = false;
+        // })
 
-        const deleteWindow = document.getElementById('delete-window');
-        deleteWindow.addEventListener('confirm', function () {
-            selectedItemSet.forEach(deleteItem);
-            selectedListSet.forEach(deleteItem);
-            selectedItemSet.clear();
-            selectedListSet.clear();
-            this.visible = false;
-            setSelecting(false);
-        })
-        deleteWindow.addEventListener('cancel', function () {
-            this.visible = false;
-        })
+        // const deleteWindow = document.getElementById('delete-window');
+        // deleteWindow.addEventListener('confirm', function () {
+        //     selectedItemSet.forEach(deleteItem);
+        //     selectedListSet.forEach(deleteItem);
+        //     selectedItemSet.clear();
+        //     selectedListSet.clear();
+        //     this.visible = false;
+        //     setSelecting(false);
+        // })
+        // deleteWindow.addEventListener('cancel', function () {
+        //     this.visible = false;
+        // })
 
         const addItemBar = document.getElementById('add-item');
         addItemBar.addEventListener('touch', () => {
