@@ -1,6 +1,10 @@
 html {
     font-family: Noto Sans SC;
     letter-spacing: 0.02em;
+
+}
+
+* {
     user-select: none;
 }
 
