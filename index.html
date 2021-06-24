@@ -73,8 +73,10 @@
     </div>
 </body>
 <script>
-    if(document.head.createShadowRoot || document.head.attachShadow){
+    if (document.head.createShadowRoot || document.head.attachShadow) {
         alert('支持')
+    } else {
+        alert('不支持')
     }
 </script>
 <script type="module">
