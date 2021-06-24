@@ -74,7 +74,13 @@
 </body>
 <script>
     if (document.head.createShadowRoot || document.head.attachShadow) {
-        alert('支持')
+        if(document.head.createShadowRoot){
+            alert('支持createShadowRoot')
+        }
+
+        if(document.head.attachShadow){
+            alert('支持attachShadow')
+        }
     } else {
         alert('不支持')
     }
