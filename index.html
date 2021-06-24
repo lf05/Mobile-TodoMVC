@@ -52,14 +52,14 @@
     <floating-window id="item-editor-window">
         <todo-item-editor id="item-editor"></todo-item-editor>
     </floating-window>
-<!-- 
+
     <floating-window id="list-editor-window">
         <todo-list-editor id="list-editor"></todo-list-editor>
     </floating-window>
 
     <floating-window id="delete-window">
         <p class="info">确认删除?</p>
-    </floating-window> -->
+    </floating-window>
 
     <div id="footer">
         <footer>
@@ -72,6 +72,11 @@
         </footer>
     </div>
 </body>
+<script>
+    if(document.head.createShadowRoot || document.head.attachShadow){
+        alert('支持')
+    }
+</script>
 <script type="module">
     import { addWaveTouch, getOffset, transition, nextKFrame } from "./js/utils.js";
     var container, checkAll, store;
@@ -494,35 +499,35 @@
             this.visible = false;
         })
 
-        // const listEditorWindow = document.getElementById('list-editor-window');
-        // const listEditor = document.getElementById('list-editor');
-        // listEditorWindow.addEventListener('confirm', function () {
-        //     var todoList;
-        //     if (listEditorWindowCaller) {
-        //         todoList = listEditorWindowCaller;
-        //     } else {
-        //         todoList = document.createElement('todo-item-list');
-        //         container.appendChild(todoList);
-        //     }
-        //     todoList.value = listEditor.value;
-        //     this.visible = false;
-        // })
-        // listEditorWindow.addEventListener('cancel', function () {
-        //     this.visible = false;
-        // })
+        const listEditorWindow = document.getElementById('list-editor-window');
+        const listEditor = document.getElementById('list-editor');
+        listEditorWindow.addEventListener('confirm', function () {
+            var todoList;
+            if (listEditorWindowCaller) {
+                todoList = listEditorWindowCaller;
+            } else {
+                todoList = document.createElement('todo-item-list');
+                container.appendChild(todoList);
+            }
+            todoList.value = listEditor.value;
+            this.visible = false;
+        })
+        listEditorWindow.addEventListener('cancel', function () {
+            this.visible = false;
+        })
 
-        // const deleteWindow = document.getElementById('delete-window');
-        // deleteWindow.addEventListener('confirm', function () {
-        //     selectedItemSet.forEach(deleteItem);
-        //     selectedListSet.forEach(deleteItem);
-        //     selectedItemSet.clear();
-        //     selectedListSet.clear();
-        //     this.visible = false;
-        //     setSelecting(false);
-        // })
-        // deleteWindow.addEventListener('cancel', function () {
-        //     this.visible = false;
-        // })
+        const deleteWindow = document.getElementById('delete-window');
+        deleteWindow.addEventListener('confirm', function () {
+            selectedItemSet.forEach(deleteItem);
+            selectedListSet.forEach(deleteItem);
+            selectedItemSet.clear();
+            selectedListSet.clear();
+            this.visible = false;
+            setSelecting(false);
+        })
+        deleteWindow.addEventListener('cancel', function () {
+            this.visible = false;
+        })
 
         const addItemBar = document.getElementById('add-item');
         addItemBar.addEventListener('touch', () => {
