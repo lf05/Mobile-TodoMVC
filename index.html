@@ -19,6 +19,12 @@
     window.TodoItemList = TodoItemList;
     window.CheckBox = CheckBox;
 
+    if(customElements){
+        alert('customElements')
+        if(customElements.get){
+            alert('customElements.get')
+        }
+    }
     alert(customElements.get('todo-item'))
 </script>
 
