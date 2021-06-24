@@ -18,6 +18,8 @@
     window.TodoItem = TodoItem;
     window.TodoItemList = TodoItemList;
     window.CheckBox = CheckBox;
+
+    alert(customElements.get('todo-item'))
 </script>
 
 <body>
@@ -72,16 +74,8 @@
         </footer>
     </div>
 </body>
-<script>
-    if(customElements){
-        alert('支持customElements');
-    }
-</script>
 <script type="module">
     import { addWaveTouch, getOffset, transition, nextKFrame } from "./js/utils.js";
-    var test = new TodoItem();
-    document.getElementById('container').appendChild(test);
-
     var container, checkAll, store;
     var lltouchable = true, ltouchable = true, touchable = true;
     function disableScroll(e) {
