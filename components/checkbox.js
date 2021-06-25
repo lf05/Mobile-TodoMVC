@@ -115,7 +115,3 @@ if (!customElements.get('check-box')) {
     customElements.define('check-box', CheckBox);
     alert("define check-box");
 }
-
-if (!customElements.get('check-box')) {
-    alert("not define check-box");
-}
