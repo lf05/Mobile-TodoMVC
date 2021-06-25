@@ -14,6 +14,8 @@
     if (!customElements) {
         alert('您的浏览器不支持customElements!');
         window.location.href = "https://www.google.cn/chrome/";
+    }else {
+        alert('您的浏览器支持customElements')
     }
 </script>
 <script type="module">
@@ -71,6 +73,8 @@
 </body>
 <script type="module">
     import { addWaveTouch, getOffset, transition, nextKFrame } from "./js/utils.js";
+    document.getElementById('add-item').innerHTML = customElements;
+
     var container, checkAll, store;
     var lltouchable = true, ltouchable = true, touchable = true;
     function disableScroll(e) {
