@@ -113,5 +113,4 @@ export default class CheckBox extends HTMLElement {
 
 if (!customElements.get('check-box')) {
     customElements.define('check-box', CheckBox);
-    alert("define check-box");
 }
