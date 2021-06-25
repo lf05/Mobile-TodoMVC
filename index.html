@@ -10,6 +10,12 @@
     <!-- <link rel="stylesheet" href="css/checkbox.css"> -->
 </head>
 
+<script>
+    if (!customElements) {
+        alert('您的浏览器不支持customElements!');
+        window.location.href = "https://www.google.cn/chrome/";
+    }
+</script>
 <script type="module">
     import "./js/common.js";
     import { TodoItem, TodoItemList } from './components/todoitem.js';
@@ -21,16 +27,7 @@
 </script>
 
 <body>
-    <div id="container">
-        <!-- <todo-item>1</todo-item>
-        <todo-item>2</todo-item>
-        <todo-item>3</todo-item>
-        <todo-item-list>
-            <todo-item>1</todo-item>
-            <todo-item>2</todo-item>
-            <todo-item>3</todo-item>
-        </todo-item-list> -->
-    </div>
+    <div id="container"></div>
 
     <div class="bar" id="add-item">
         <i class="icon-add"></i>
@@ -168,48 +165,47 @@
         existingItem.color = newValue.color;
     }
 
-    // window.onbeforeunload = () => {
-    //     store = [];
-    //     Array.from(container.children).forEach((element) => {
-    //         if (element instanceof TodoItem) {
-    //             const { tagName, color, value, finished } = element;
-    //             store.push({ tagName, color, value, finished });
-    //         } else if (element instanceof TodoItemList) {
-    //             const { tagName, value } = element;
-    //             var children = [];
-    //             Array.from(element.children).forEach(item => {
-    //                 const { tagName, color, value, finished } = item;
-    //                 children.push({ tagName, color, value, finished });
-    //             })
-    //             store.push({ tagName, value, children });
-    //         }
-    //     })
-    //     store = JSON.stringify(store);
-    //     localStorage.setItem('todo-data', store);
-    // }
+    window.onbeforeunload = () => {
+        store = [];
+        Array.from(container.children).forEach((element) => {
+            if (element instanceof TodoItem) {
+                const { tagName, color, value, finished } = element;
+                store.push({ tagName, color, value, finished });
+            } else if (element instanceof TodoItemList) {
+                const { tagName, value } = element;
+                var children = [];
+                Array.from(element.children).forEach(item => {
+                    const { tagName, color, value, finished } = item;
+                    children.push({ tagName, color, value, finished });
+                })
+                store.push({ tagName, value, children });
+            }
+        })
+        store = JSON.stringify(store);
+        localStorage.setItem('todo-data', store);
+    }
     window.onload = () => {
         container = document.getElementById('container');
 
-        // store = localStorage.getItem('todo-data');
-        // if (store) {
-        //     store = JSON.parse(store);
-        //     store.forEach(element => {
-        //         if (element.tagName === "TODO-ITEM") {
-        //             createItem(element);
-        //         } else if (element.tagName === "TODO-ITEM-LIST") {
-        //             const todoList = createList(element);
-        //             element.children.forEach((item) => {
-        //                 createItem(item, todoList);
-        //             });
-        //         }
-        //     })
-        // }
+        store = localStorage.getItem('todo-data');
+        if (store) {
+            store = JSON.parse(store);
+            store.forEach(element => {
+                if (element.tagName === "TODO-ITEM") {
+                    createItem(element);
+                } else if (element.tagName === "TODO-ITEM-LIST") {
+                    const todoList = createList(element);
+                    element.children.forEach((item) => {
+                        createItem(item, todoList);
+                    });
+                }
+            })
+        }
 
         const footer = document.getElementById('footer');
         container.addEventListener('select', function (e) {
             const target = e.target;
             const selected = e.detail.selected;
-            console.log(target);
             if (target instanceof TodoItem || target instanceof TodoItemList) {
                 select(target, selected);
             }
@@ -302,15 +298,18 @@
                                     target.style.top = `${previousY + 60 - offsetTop + top}px`;
                                 },
                                 lastFrame: () => {
-                                    target.parentElement.removeChild(target);
-
-                                    if (nextTodo) {
-                                        nextTodo.parentElement.insertBefore(target, nextTodo);
-                                    } else if (previousTodo.parentElement instanceof TodoItemList) {
-                                        previousTodo.parentElement.parentElement.appendChild(target);
-                                    } else {
-                                        previousTodo.parentElement.appendChild(target);
+                                    if (nextTodo || previousTodo) {
+                                        target.parentElement.removeChild(target);
+                                        if (nextTodo) {
+                                            nextTodo.parentElement.insertBefore(target, nextTodo);
+                                        } else if (previousTodo.parentElement instanceof TodoItemList) {
+                                            previousTodo.parentElement.parentElement.appendChild(target);
+                                        } else {
+                                            previousTodo.parentElement.appendChild(target);
+                                        }
                                     }
+
+
                                     Array.from(container.children).forEach((element) => {
                                         element.reset();
                                     })
