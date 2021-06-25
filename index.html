@@ -19,9 +19,7 @@
     window.TodoItem = TodoItem;
     window.TodoItemList = TodoItemList;
     window.CheckBox = CheckBox;
-</script>
 
-<script>
     if (!customElements) {
         alert('您的浏览器不支持customElements!');
         window.location.href = "https://www.google.cn/chrome/";
@@ -31,11 +29,11 @@
             alert('您的浏览器支持customElements.get')
             if (customElements.get('todo-item')) {
                 alert('您的浏览器支持customElements.get("todo-item")')
+                alert(customElements.get('todo-item'));
             }
         }
     }
 </script>
-
 <body>
     <div id="container"></div>
 
