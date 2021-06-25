@@ -10,14 +10,7 @@
     <!-- <link rel="stylesheet" href="css/checkbox.css"> -->
 </head>
 
-<script>
-    if (!customElements) {
-        alert('您的浏览器不支持customElements!');
-        window.location.href = "https://www.google.cn/chrome/";
-    }else {
-        alert('您的浏览器支持customElements')
-    }
-</script>
+
 <script type="module">
     import "./js/common.js";
     import { TodoItem, TodoItemList } from './components/todoitem.js';
@@ -26,6 +19,21 @@
     window.TodoItem = TodoItem;
     window.TodoItemList = TodoItemList;
     window.CheckBox = CheckBox;
+</script>
+
+<script>
+    if (!customElements) {
+        alert('您的浏览器不支持customElements!');
+        window.location.href = "https://www.google.cn/chrome/";
+    } else {
+        alert('您的浏览器支持customElements')
+        if (customElements.get) {
+            alert('您的浏览器支持customElements.get')
+            if (customElements.get('todo-item')) {
+                alert('您的浏览器支持customElements.get("todo-item")')
+            }
+        }
+    }
 </script>
 
 <body>
