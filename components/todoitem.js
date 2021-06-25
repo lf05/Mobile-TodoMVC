@@ -1,6 +1,4 @@
-import "./checkbox.js";
-import { addWaveTouch, transition } from "../js/utils.js";
-export class TodoItem extends HTMLElement {
+class TodoItem extends HTMLElement {
     constructor() {
         super()
         const shadowRoot = this.attachShadow({ mode: 'open' });
@@ -194,7 +192,7 @@ if (!customElements.get('todo-item')) {
     customElements.define('todo-item', TodoItem);
 }
 
-export class TodoItemList extends HTMLElement {
+class TodoItemList extends HTMLElement {
     constructor() {
         super()
         const shadowRoot = this.attachShadow({ mode: 'open' });
@@ -540,7 +538,7 @@ if (!customElements.get('todo-item-list')) {
     customElements.define('todo-item-list', TodoItemList);
 }
 
-export class TodoItemEditor extends HTMLElement {
+class TodoItemEditor extends HTMLElement {
     static priority2color = ['red', 'orange', 'yellow', 'lightgreen', 'cyan', 'blue', 'purple'];
     constructor() {
         super()
@@ -737,7 +735,7 @@ if (!customElements.get('todo-item-editor')) {
     customElements.define('todo-item-editor', TodoItemEditor);
 }
 
-export class TodoListEditor extends HTMLElement {
+class TodoListEditor extends HTMLElement {
     constructor() {
         super()
         const shadowRoot = this.attachShadow({ mode: 'open' });

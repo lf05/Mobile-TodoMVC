@@ -1,4 +1,4 @@
-export default class CheckBox extends HTMLElement {
+class CheckBox extends HTMLElement {
     constructor() {
         super();
         const shadowRoot = this.attachShadow({ mode: 'open' });

@@ -1,5 +1,4 @@
-import { addWaveTouch, transition } from "../js/utils.js";
-export class FloatingWindow extends HTMLElement {
+class FloatingWindow extends HTMLElement {
     constructor() {
         super();
         const shadowRoot = this.attachShadow({ mode: 'open' });

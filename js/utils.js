@@ -1,4 +1,4 @@
-export function addWaveTouch() {
+function addWaveTouch() {
     this.addEventListener('touchstart', function (e) {
         const { position, zIndex, overflow } = window.getComputedStyle(this);
         const { style } = this;
@@ -37,7 +37,7 @@ export function addWaveTouch() {
     })
 }
 
-export function getOffset(element) {
+function getOffset(element) {
     var { offsetTop, offsetLeft, offsetWidth, offsetHeight } = element;
     var fixed = false;
     while (element.offsetParent != null) {
@@ -56,7 +56,7 @@ export function getOffset(element) {
     };
 }
 
-export function transition(name, duration = 0, callback = {}) {
+function transition(name, duration = 0, callback = {}) {
 
     toFunction(callback.firstFrame)();
     this.classList.add(`${name}`);
@@ -83,7 +83,7 @@ function toFunction(func) {
     return func && typeof func === 'function' ? func : empty;
 }
 
-export function nextKFrame(callback, k = 2) {
+function nextKFrame(callback, k = 2) {
     callback = toFunction(callback);
     //setTimeout(callback, 1000);
     if (window.requestAnimationFrame) {

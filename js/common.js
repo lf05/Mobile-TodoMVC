@@ -1,4 +1,4 @@
-import { getOffset } from "./utils.js";
+// import { getOffset } from "./utils.js";
 if (!Math.clamp) {
     Math.clamp = (value, min, max) => {
         return Math.max(min, Math.min(max, value));

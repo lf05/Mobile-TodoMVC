@@ -7,11 +7,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/noto-sans-sc@12.0.0/noto_sans_sc_regular/css.css">
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/index.css">
-    <!-- <link rel="stylesheet" href="css/checkbox.css"> -->
+    <script src="./js/common.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./components/checkbox.js"></script>
+    <script src="./components/floatingwindow.js"></script>
+    <script src="./components/todoitem.js"></script>
 </head>
 
 
-<script type="module">
+<!-- <script type="module">
     import "./js/common.js";
     import { TodoItem, TodoItemList } from './components/todoitem.js';
     import './components/floatingwindow.js';
@@ -33,7 +37,7 @@
             }
         }
     }
-</script>
+</script> -->
 <body>
     <div id="container"></div>
 
@@ -78,8 +82,7 @@
     </div>
 </body>
 <script type="module">
-    import { addWaveTouch, getOffset, transition, nextKFrame } from "./js/utils.js";
-    document.getElementById('add-item').innerHTML = customElements;
+    // import { addWaveTouch, getOffset, transition, nextKFrame } from "./js/utils.js";
 
     var container, checkAll, store;
     var lltouchable = true, ltouchable = true, touchable = true;
