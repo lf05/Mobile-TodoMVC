@@ -124,17 +124,22 @@
         }
         Array.from(container.children).forEach((element) => {
             element.selecting = selecting;
+            element.checkbox.checked = false;
+            if(element instanceof TodoItemList){
+                element.selectedCount = 0;
+            }
         })
     }
 
     function deleteItem(item) {
         const parent = item.parentElement;
-        item.onDelete();
-        if (parent instanceof TodoItemList) {
-            if (parent.children.length === 0) {
-                parent.onDelete();
+        item.onDelete().then(() => {
+            if (parent instanceof TodoItemList) {
+                if (parent.children.length === 0) {
+                    parent.onDelete();
+                }
             }
-        }
+        })
     }
 
     function createItem(newValue, parent = container) {
@@ -520,14 +525,15 @@
 
         const addItemBar = document.getElementById('add-item');
         addItemBar.addEventListener('touch', () => {
-            itemEditorWindow.value = "";
-            itemEditorWindow.color = "lightgreen"
+            itemEditor.value = "";
+            itemEditor.color = "lightgreen"
             itemEditorWindow.visible = true;
         })
         addWaveTouch.call(addItemBar);
 
         const addListBar = document.getElementById('add-list');
         addListBar.addEventListener('touch', () => {
+            listEditor.value = "";
             listEditorWindow.visible = true;
         })
         addWaveTouch.call(addListBar);

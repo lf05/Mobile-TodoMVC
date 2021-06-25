@@ -138,13 +138,13 @@ export class TodoItem extends HTMLElement {
     }
 
     onDelete() {
-        if (this.parentElement instanceof TodoItemList) {
-            this.parentElement.onChildDelete(this.checkbox.checked);
-        }
-        transition.call(this.todoItem, "leave", 300, {
-            lastFrame: () => {
-                this.parentElement.removeChild(this);
-            }
+        return new Promise((reslove) => {
+            transition.call(this.todoItem, "leave", 300, {
+                lastFrame: () => {
+                    this.parentElement.removeChild(this);
+                    reslove();
+                }
+            })
         })
     }
 
@@ -507,18 +507,6 @@ export class TodoItemList extends HTMLElement {
         }
 
         if (this.children.length > 0 && this.selectedCount === this.children.length) {
-            this.checkbox.checked = true;
-        } else {
-            this.checkbox.checked = false;
-        }
-    }
-
-    onChildDelete(selected) {
-        if (selected) {
-            this.selectedCount--;
-        }
-
-        if (this.selectedCount === this.children.length) {
             this.checkbox.checked = true;
         } else {
             this.checkbox.checked = false;
