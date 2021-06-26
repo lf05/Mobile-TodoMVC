@@ -479,13 +479,16 @@ export class TodoItemList extends HTMLElement {
     }
 
     onDelete() {
-        transition.call(this.header, 'leave', 300, {
-            firstFrame: () => {
-                this.header.style.top = 0;
-            },
-            lastFrame: () => {
-                this.parentElement.removeChild(this);
-            }
+        return new Promise(reslove => {
+            transition.call(this.header, 'leave', 300, {
+                firstFrame: () => {
+                    this.header.style.top = 0;
+                },
+                lastFrame: () => {
+                    this.parentElement.removeChild(this);
+                    reslove();
+                }
+            })
         })
     }
 

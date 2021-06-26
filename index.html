@@ -67,7 +67,6 @@
     import { addWaveTouch, getOffset, transition, nextKFrame } from "./js/utils.js";
 
     var container, checkAll, store;
-    var lltouchable = true, ltouchable = true, touchable = true;
     function disableScroll(e) {
         document.body.style.overflow = "hidden";
         e.preventDefault();
@@ -184,6 +183,7 @@
         store = JSON.stringify(store);
         localStorage.setItem('todo-data', store);
     }
+    
     window.onload = () => {
         container = document.getElementById('container');
 
@@ -202,7 +202,8 @@
             })
         }
 
-        const footer = document.getElementById('footer');
+        //初始化container
+        var lltouchable = true, ltouchable = true, touchable = true;
         container.addEventListener('select', function (e) {
             const target = e.target;
             const selected = e.detail.selected;
@@ -478,6 +479,7 @@
             setSelecting(selecting);
         })
 
+        //初始化弹窗
         const itemEditorWindow = document.getElementById('item-editor-window');
         const itemEditor = document.getElementById('item-editor');
         itemEditorWindow.addEventListener('confirm', function () {
@@ -523,6 +525,7 @@
             this.visible = false;
         })
 
+        //初始化Bar
         const addItemBar = document.getElementById('add-item');
         addItemBar.addEventListener('touch', () => {
             itemEditor.value = "";
@@ -538,6 +541,15 @@
         })
         addWaveTouch.call(addListBar);
 
+        const clearFinishedBar = document.getElementById('clear-finish');
+        clearFinishedBar.addEventListener('touch', () => {
+            finishedItemSet.forEach(deleteItem);
+            finishedItemSet.clear();
+            setSelecting(false);
+        })
+        addWaveTouch.call(clearFinishedBar);
+
+        //初始化footer
         checkAll = document.getElementById('check-all');
         checkAll.addEventListener('select', function (e) {
             const selected = e.detail.selected;
@@ -546,14 +558,6 @@
                 select(element, selected);
             })
         })
-
-        const clearFinishedBar = document.getElementById('clear-finish');
-        clearFinishedBar.addEventListener('touch', () => {
-            finishedItemSet.forEach(deleteItem);
-            finishedItemSet.clear();
-            setSelecting(false);
-        })
-        addWaveTouch.call(clearFinishedBar);
 
         const dofinish = document.getElementById('dofinish');
         dofinish.addEventListener('touch', () => {
