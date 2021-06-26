@@ -463,7 +463,7 @@
                 } else if (!lastOfListOut && curY >= offsetTop + 60) {
                     if (target instanceof TodoItem && target.parentElement instanceof TodoItemList && target === target.parentElement.lastElementChild) {
                         target.parentElement.virtualRemoveBackItem();
-                        targetOut = true;
+                        lastOfListOut = true;
                     }
                 }
 
